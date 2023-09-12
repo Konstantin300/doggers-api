@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -7,24 +8,19 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateContractorDto {
+export class LoginDto {
   @IsEmail()
   @IsNotEmpty()
   @IsString()
   @Length(2, 255)
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', description: 'email', required: true })
   email: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: 'string' })
-  @Length(8, 255)
   @MinLength(6)
+  @Length(8, 255)
+  @Exclude()
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Length(2, 255)
-  @ApiProperty({ type: 'string' })
-  bio: string;
 }

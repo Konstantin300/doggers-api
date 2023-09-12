@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  MinLength,
+} from 'class-validator';
 
 export class CreateCustomerDto {
   @IsEmail()
@@ -13,6 +19,7 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   @ApiProperty({ type: 'string' })
   @Length(8, 255)
+  @MinLength(6)
   password: string;
 
   @IsString()

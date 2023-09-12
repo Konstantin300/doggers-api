@@ -7,17 +7,20 @@ import { Customer } from 'src/customer/entities/customer.entity';
 import { UsersService } from 'src/users/users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { Contractor } from 'src/contractor/entities/contractor.entity';
+import { config } from 'dotenv';
+config();
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Contractor, Customer]),
     JwtModule.register({
-      secret: 'secret',
+      secret: process.env.JWT_SECRET,
       signOptions: {
-        expiresIn: '24h',
+        expiresIn: '30d',
       },
     }),
   ],
+
   controllers: [AuthController],
   providers: [AuthService, UsersService],
 })

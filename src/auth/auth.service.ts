@@ -15,6 +15,7 @@ import { Customer } from 'src/customer/entities/customer.entity';
 import { UsersService } from 'src/users/users.service';
 import { Contractor } from 'src/contractor/entities/contractor.entity';
 import { CreateContractorDto } from 'src/contractor/dto/create-contractor.dto';
+import { LoginDto } from './dto/login-dto';
 
 @Injectable()
 export class AuthService {
@@ -34,9 +35,9 @@ export class AuthService {
   async registerContractor(createContractorDto: CreateContractorDto) {
     const { email, password, bio } = createContractorDto;
 
-    const candidate = await this.userService.getUserByEmail(email);
+    const isUserExist = await this.userService.getUserByEmail(email);
 
-    if (candidate) {
+    if (isUserExist) {
       throw new HttpException(
         'User with this email already exists',
         HttpStatus.BAD_REQUEST,
@@ -50,7 +51,6 @@ export class AuthService {
       password: hashedPassword,
       role: Role.Contractor,
     });
-    console.log('^^^^^', createContractorDto);
 
     await this.contractorsRepository.save({
       bio,
@@ -59,20 +59,21 @@ export class AuthService {
 
     const savedUser = await this.usersRepository.save(user);
 
+    const { password: _, ...userWithoutPassword } = savedUser;
+
     const token = await this.generateToken(savedUser);
 
     return {
       token: token,
-      role: user.role,
-      id: savedUser.id,
+      ...userWithoutPassword,
     };
   }
 
   async registerCustomer(createCustomerDto: CreateCustomerDto) {
     const { email, password, name } = createCustomerDto;
-    const candidate = await this.userService.getUserByEmail(email);
+    const isUserExist = await this.userService.getUserByEmail(email);
 
-    if (candidate) {
+    if (isUserExist) {
       throw new HttpException(
         'User with this email already exists',
         HttpStatus.BAD_REQUEST,
@@ -94,36 +95,35 @@ export class AuthService {
 
     const savedUser = await this.usersRepository.save(user);
 
+    const { password: _, ...userWithoutPassword } = savedUser;
+
     const token = await this.generateToken(savedUser);
     return {
       token: token,
-      role: user.role,
-      id: savedUser.id,
+      ...userWithoutPassword,
     };
   }
 
-  async login(createContractorDto: CreateContractorDto) {
-    const user = await this.validateUser(createContractorDto);
+  async login(loginDto: LoginDto) {
+    const user = await this.validateUser(loginDto);
+    const { password: _, ...userWithoutPassword } = user;
 
-    return user;
+    return userWithoutPassword;
   }
 
   private async generateToken(user: User) {
     const payload = { email: user.email, id: user.id, role: user.role };
-    console.log('payload', payload);
 
     const token = this.jwtService.sign(payload);
     return token;
   }
 
-  private async validateUser(createContractorDto: CreateContractorDto) {
-    const user = await this.userService.getUserByEmail(
-      createContractorDto.email,
+  private async validateUser(loginDto: LoginDto) {
+    const user = await this.userService.getUserByEmail(loginDto.email);
+    const passwordEquals = await bcrypt.compare(
+      loginDto?.password,
+      user?.password,
     );
-    const isPasswordUserExist = user?.password;
-    const passwordEquals =
-      isPasswordUserExist &&
-      (await bcrypt.compare(createContractorDto?.password, user?.password));
     if (user && passwordEquals) {
       return user;
     }
