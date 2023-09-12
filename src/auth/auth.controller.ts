@@ -1,4 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateContractorDto } from '../users/dto/create-user.dto';
 import { CreateCustomerDto } from 'src/customer/dto/create-customer.dto';
@@ -10,6 +16,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: 'Register new contractor' })
+  @UsePipes(new ValidationPipe())
   @Post('register-contractor')
   @ApiResponse({
     status: 201,
@@ -25,6 +32,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Register new customer' })
+  @UsePipes(new ValidationPipe())
   @ApiResponse({
     status: 201,
     description: 'The registration was successful',
