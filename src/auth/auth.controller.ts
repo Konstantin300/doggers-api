@@ -16,7 +16,6 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: 'Register new contractor' })
-  @UsePipes(new ValidationPipe())
   @Post('register-contractor')
   @ApiResponse({
     status: 201,
@@ -32,7 +31,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Register new customer' })
-  @UsePipes(new ValidationPipe())
   @ApiResponse({
     status: 201,
     description: 'The registration was successful',
