@@ -59,13 +59,12 @@ export class AuthService {
 
     const savedUser = await this.usersRepository.save(user);
 
-    const { password: _, ...userWithoutPassword } = savedUser;
-
     const token = await this.generateToken(savedUser);
 
     return {
-      token: token,
-      ...userWithoutPassword,
+      ...savedUser,
+      password: null,
+      token,
     };
   }
 
@@ -95,20 +94,18 @@ export class AuthService {
 
     const savedUser = await this.usersRepository.save(user);
 
-    const { password: _, ...userWithoutPassword } = savedUser;
-
     const token = await this.generateToken(savedUser);
     return {
-      token: token,
-      ...userWithoutPassword,
+      ...savedUser,
+      password: null,
+      token,
     };
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto);
-    const { password: _, ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
+    const token = await this.generateToken(user);
+    return { ...user, password: null, token };
   }
 
   private async generateToken(user: User) {
