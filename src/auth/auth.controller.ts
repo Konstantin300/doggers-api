@@ -25,8 +25,10 @@ export class AuthController {
     return await this.authService.registerContractor(createContractorDto);
   }
 
+  @ApiOperation({ summary: 'login' })
   @Post('login')
   async login(@Body() user: LoginDto) {
+    console.log('user', user);
     return await this.authService.login(user);
   }
 
