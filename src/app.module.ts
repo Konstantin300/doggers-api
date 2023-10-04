@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CustomerModule } from './customer/customer.module';
 import { ContractorModule } from './contractor/contractor.module';
+import { PostModule } from './post/post.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ContractorModule } from './contractor/contractor.module';
     AuthModule,
     CustomerModule,
     ContractorModule,
+    PostModule,
+    ImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
