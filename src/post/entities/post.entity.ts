@@ -28,7 +28,7 @@ export class Post {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToMany(() => Image, (image) => image.imageUrl, { cascade: true })
+  @ManyToMany(() => Image, (image) => image.id, { cascade: true })
   @JoinTable()
   images: Image[];
 }

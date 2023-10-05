@@ -36,6 +36,19 @@ export class PostController {
     return await this.postService.createPost(userId, title, file);
   }
 
+  @Patch(':id')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 6 }]))
+  async update(
+    @Param('id') id: string,
+    @UploadedFiles()
+    file: {
+      avatarImages?: Array<multer.Multer.File>;
+    },
+    @Body('title') title: string,
+  ) {
+    console.log('id', id);
+    return await this.postService.update(id, title, file);
+  }
   @Get()
   findAll() {
     return this.postService.findAll();
@@ -44,20 +57,6 @@ export class PostController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postService.findOne(id);
-  }
-
-  @Patch(':id')
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 6 }]))
-  update(
-    @Param('id') id: string,
-    @UploadedFiles()
-    file: {
-      avatarImages?: Array<multer.Multer.File>;
-    },
-    @Body('title') UpdatePostDto: UpdatePostDto,
-  ) {
-    console.log('id', id);
-    return this.postService.update(id, UpdatePostDto);
   }
 
   @Delete(':id')

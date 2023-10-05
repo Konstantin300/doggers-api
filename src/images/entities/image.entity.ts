@@ -19,6 +19,6 @@ export class Image {
   @Column({ name: 'userId' })
   userId: string;
 
-  @ManyToMany(() => Post, (post) => post.images)
+  @ManyToMany(() => Post, (post) => post.id, { cascade: true })
   posts: Post[];
 }

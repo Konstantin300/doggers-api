@@ -31,89 +31,79 @@ export class PostService {
 
     const imageUrls = await this.imagesService.create(userId, images);
 
-    // const imageEntities: Image[] = imageUrls.imageUrl.map((obj) => {
-    //   return obj.imageUrl;
-    // });
-    // const imageEntities: Image[] = imageUrls.map((imageUrl) => {
-    //   const img = new Image();
-    //   img.imageUrl = imageUrl;
-    //   img.userId = user.id;
-    //   return img;
-    // });
-
-    // const imageEntities = await Promise.all(
-    //   imageUrls.map(async (imageUrl) => {
-    //     const image = new Image();
-    //     image.imageUrl = imageUrl;
-    //     image.userId = user.id;
-    //     return image;
-    //   }),
-    // );
-
     const post = new Post();
-    const imageEntities = await Promise.all(
-      imageUrls.map(async (imageUrl) => {
-        post.images = imageUrl;
-        return;
-      }),
-    );
-
     post.title = title;
-
     post.user = user;
+    post.images = imageUrls;
 
     const savedPost = await this.postRepository.save(post);
 
-    // await this.postRepository
-    //   .createQueryBuilder('post')
-    //   .relation(Post, 'images')
-    //   .of(savedPost)
-    //   .loadMany();
     return savedPost;
   }
 
-  findAll() {
-    return this.postRepository.find({ relations: ['images'] });
-  }
-
-  findOne(id: string) {
-    return this.postRepository.findOne({
+  async update(id: string, title: string, images: any) {
+    console.log('---');
+    const post = await this.postRepository.findOne({
       where: { id },
       relations: ['images'],
     });
-  }
 
-  async update(id: string, updatePostDto: UpdatePostDto) {
-    const post = await this.postRepository.find({
-      where: { id },
-      relations: ['images'],
-    });
-    // post.title = updatePostDto.title;
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    const imageUrls = await this.imagesService.create(id, images);
+
+    post.title = title;
+
+    console.log('post', post);
+
+    if (imageUrls) {
+      await Promise.all(
+        post.images.map(async (image) => {
+          const result = await this.imagesService.remove(image.id);
+          return result;
+        }),
+      );
+    }
 
     const newSavedPost = await this.postRepository.save(post);
-    // console.log('NNNNN', post);
-    // console.log('44444', updatePostDto);
     return newSavedPost;
   }
 
+  async findAll() {
+    const allPosts = await this.postRepository.find({ relations: ['images'] });
+    console.log('allPosts', allPosts);
+    return allPosts;
+  }
+
+  async findOne(id: string) {
+    return await this.postRepository.findOne({
+      where: { id },
+      relations: ['images'],
+    });
+  }
+
   async remove(id: string) {
-    const post = await this.postRepository.find({
+    const post = await this.postRepository.findOne({
       where: { id },
       relations: ['images'],
     });
     console.log('77777', post);
 
-    // const imageDelete = await Promise.all(
-    //   post.images.map(async (image) => {
-    //     console.log('^^^', image);
-    //     const result = await this.imagesService.remove(image.id);
-    //     console.log('result', result);
-    //     return result;
-    //   }),
-    // );
-    // console.log('imageDelete', imageDelete);
-    // const deletedPost = this.postRepository.delete(id);
-    // // const deletedImages = this.imagesService.remove(id);
-    // return { deletedPost, imageDelete };
+    const imageDelete = await Promise.all(
+      post.images.map(async (image) => {
+        console.log('^^^', image);
+        const result = await this.imagesService.remove(image.id);
+        console.log('result', result);
+        return result;
+      }),
+    );
+    console.log('imageDelete', imageDelete);
+    const deletedPost = await this.postRepository.delete(id);
+    // const deletedImages = this.imagesService.remove(id);
+    // console.log('deletedImages', deletedImages);
+    console.log('deletedPost', deletedPost);
+    return { deletedPost, imageDelete };
   }
 }
