@@ -1,6 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateImageDto } from './dto/create-image.dto';
-import { UpdateImageDto } from './dto/update-image.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Image } from './entities/image.entity';
@@ -17,6 +15,7 @@ export class ImagesService {
   ) {}
   async create(userId: string, images: any) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
+    console.log('user exist', user);
 
     if (!user) {
       throw new HttpException(
@@ -91,18 +90,20 @@ export class ImagesService {
   }
 
   async remove(id: string) {
+    console.log('ff');
     const image = await this.imageRepository.findOne({ where: { id } });
     if (!image) {
       throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
     }
-    console.log('id', id);
     const deletedImageFromFirebase = await this.deleteImageFromFirebase(
       image.imageUrl,
     );
 
     if (deletedImageFromFirebase) {
-      console.log('srabotalo');
-      return await this.imageRepository.delete({ id });
+      console.log('id', id);
+      const delImages = await this.imageRepository.delete({ id });
+      console.log('delImages', delImages);
+      return delImages;
     }
 
     // return await this.imageRepository.delete({ id });

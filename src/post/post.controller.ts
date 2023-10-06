@@ -8,12 +8,13 @@ import {
   Delete,
   UseInterceptors,
   UploadedFiles,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import multer from 'multer';
+import { JwtAuthGuard } from 'src/guards/jwt-guards';
 
 @Controller('post')
 export class PostController {
@@ -22,7 +23,6 @@ export class PostController {
   @Post(':userId')
   @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 6 }]))
   async create(
-    // @Body() createPostDto: CreatePostDto,
     @Body('title') title: string,
 
     @UploadedFiles()
@@ -37,8 +37,10 @@ export class PostController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 6 }]))
   async update(
+    @Req() req: any,
     @Param('id') id: string,
     @UploadedFiles()
     file: {
@@ -46,8 +48,7 @@ export class PostController {
     },
     @Body('title') title: string,
   ) {
-    console.log('id', id);
-    return await this.postService.update(id, title, file);
+    return await this.postService.update(id, req.user.id, title, file);
   }
   @Get()
   findAll() {
