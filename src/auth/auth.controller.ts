@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -10,6 +12,7 @@ import { CreateContractorDto } from '../users/dto/create-user.dto';
 import { CreateCustomerDto } from 'src/customer/dto/create-customer.dto';
 import { LoginDto } from './dto/login-dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/guards/jwt-guards';
 
 @Controller('auth')
 export class AuthController {
@@ -28,7 +31,6 @@ export class AuthController {
   @ApiOperation({ summary: 'login' })
   @Post('login')
   async login(@Body() user: LoginDto) {
-    console.log('user', user);
     return await this.authService.login(user);
   }
 

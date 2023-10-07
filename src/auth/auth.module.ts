@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { Contractor } from 'src/contractor/entities/contractor.entity';
 import { config } from 'dotenv';
+import { JwtStrategy } from './jwt.strategy';
 config();
 
 @Module({
@@ -22,6 +23,6 @@ config();
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, UsersService],
+  providers: [AuthService, UsersService, JwtStrategy],
 })
 export class AuthModule {}
